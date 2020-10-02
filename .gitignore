@@ -1,0 +1,12 @@
+robot_ws/src/deps/*
+robot_ws/install/*
+robot_ws/log/*
+robot_ws/bundle/*
+robot_ws/build/*
+simulation_ws/src/deps/*
+simulation_ws/install/*
+simulation_ws/log/*
+simulation_ws/bundle/*
+simulation_ws/build/*
+
+
