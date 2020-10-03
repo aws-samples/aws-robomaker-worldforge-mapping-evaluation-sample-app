@@ -20,13 +20,6 @@
   <!-- mapping -->
   <node pkg="gmapping" type="slam_gmapping" name="gmapping" />
 
-  <!-- AMCL -->
-  <include file="$(find turtlebot3_navigation)/launch/amcl.launch">
-      <arg name="initial_pose_x" default="$(arg x_pos)"/>
-      <arg name="initial_pose_y" default="$(arg y_pos)"/>
-      <arg name="initial_pose_a" default="$(arg yaw)"/>
-  </include>
-
   <!-- move_base -->
   <include file="$(find turtlebot3_navigation)/launch/move_base.launch">
     <arg name="model" value="$(arg model)" />
