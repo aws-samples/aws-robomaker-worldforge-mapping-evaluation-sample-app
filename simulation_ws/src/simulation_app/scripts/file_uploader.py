@@ -18,6 +18,10 @@
 #
 
 """
+This rosnode keeps track of the current position of the robot. It also has methods
+to save and upload current map available on /map topic. This rosnode has a method
+to cancel a RoboMaker simulation, and call it when either the robot has stopped 
+moving for a certain time, or the simulation itself has run for a designated time.
 """
 
 import rospy
@@ -36,7 +40,7 @@ class SendData:
         self.prev_nav_pose = {'x' : 0.0, 'y' : 0.0 }
         self.upload_map_and_terminate = False
         self.sent_terminate_command = False
-        self.simulation_id = rospy.get_parm('~AWS_ROBOMAKER_SIMULATION_JOB_ID')
+        self.simulation_id = rospy.get_param('~AWS_ROBOMAKER_SIMULATION_JOB_ID')
         self.ROBOT_STOP_TIMEOUT = rospy.get_param('~ROBOT_STOP_TIMEOUT')
         self.TOTAL_MAPPING_TIMEOUT = rospy.get_parm('~TOTAL_MAPPING_TIMEOUT')
         self.NORM_ONE_DISTANCE_THRESHOLD = rospy.get_parm('~NORM_ONE_DISTANCE_THRESHOLD')
