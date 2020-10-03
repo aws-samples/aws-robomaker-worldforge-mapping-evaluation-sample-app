@@ -1,37 +1,36 @@
 #!/usr/bin/env python
 
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: MIT-0
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy of this
-# software and associated documentation files (the "Software"), to deal in the Software
-# without restriction, including without limitation the rights to use, copy, modify,
-# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""
+This script is purely to help create the 'batch_config.json' file to launch batch simulation parameters for
+sample application at https://github.com/aws-samples/aws-robomaker-worldforge-mapping-evaluation-sample-app.
+
+The parameters in this template are not exhaustive, and may not apply to all applications.
+Users should refer the following two api's
+https://docs.aws.amazon.com/robomaker/latest/dg/API_CreateSimulationJob.html
+https://docs.aws.amazon.com/robomaker/latest/dg/API_StartSimulationJobBatch.html
+to expand to other applications.
+
+usage: 'python create_batch_params.py'
+"""
+
 
 import json
 
-list_of_worlds = [
-    ]
-
+### Fill these values before running the script
+list_of_world_arns = []
+sim_job_requests = []
+subnet_1 = ""
+subnet_2 = ""
+security_group = ""
+assign_ip = True
+iam_arn = ""
+sim_app_arn = ""
+bucket_name=""
+###
 config= {}
 config['batchPolicy'] = { "timeoutInSeconds": 7200, "maxConcurrency": 5 }
-sim_job_requests = []
-SUBNET_1 = ""
-SUBNET_2 = ""
-SECURITY_GROUP = ""
-ASSIGN_IP = True
-IAM_ARN = ""
-SIM_APP_ARN = ""
 
-def job_params(IAM_ARN, SIM_APP_ARN, WORLD_ID="", SUBNET_1="", SUBNET_2="", SECURITY_GROUP="", ASSIGN_IP=True):
+def job_params(IAM_ARN, SIM_APP_ARN, WORLD_ID="", BUCKET_NAME="", SUBNET_1="", SUBNET_2="", SECURITY_GROUP="", ASSIGN_IP=True):
     return {
         "maxJobDurationInSeconds": 3600,
         "iamRole": IAM_ARN,
@@ -41,10 +40,11 @@ def job_params(IAM_ARN, SIM_APP_ARN, WORLD_ID="", SUBNET_1="", SUBNET_2="", SECU
                 "application": SIM_APP_ARN,
                 "launchConfig": {
                     "packageName": "simulation_app",
-                    "launchFile": "worldforge_turtlebot_navigation.launch",
+                    "launchFile": "mapping_sample_application.launch",
                     "environmentVariables": {
                         "TURTLEBOT3_MODEL": "waffle_pi",
-                        "BUCKET_NAME": "data-client",
+                        "BUCKET_NAME": BUCKET_NAME,
+                        "GAZEBO_WORLD": WORLDFORGE,
                     },
                    "streamUI": True
                 },
@@ -67,8 +67,9 @@ def job_params(IAM_ARN, SIM_APP_ARN, WORLD_ID="", SUBNET_1="", SUBNET_2="", SECU
         },
     }
 
-for WORLD_ID in list_of_worlds:
-    sim_job_requests.append(job_params(IAM_ARN,SIM_APP_ARN, WORLD_ID, SUBNET_1, SUBNET_2, SECURITY_GROUP, ASSIGN_IP))
+for world_id in list_of_world_arns:
+    sim_job_requests.append(job_params(iam_arn, sim_app_arn, world_id, bucket_name, subnet_1, subnet_2, security_group, assign_ip))
+
 config['createSimulationJobRequests'] = sim_job_requests
-with open("batch_config.json", 'a') as f:
+with open("batch_config.json", 'w') as f:
     f.write(json.dumps(config,indent=4, sort_keys=True ))
