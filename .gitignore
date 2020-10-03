@@ -8,5 +8,5 @@ simulation_ws/install/*
 simulation_ws/log/*
 simulation_ws/bundle/*
 simulation_ws/build/*
-
+*/batch_config.json
 
