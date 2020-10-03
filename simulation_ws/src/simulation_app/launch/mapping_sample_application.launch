@@ -37,5 +37,11 @@
     <arg name="s3_bucket" value="$(arg s3_bucket)"/>
   </include>
 
-  <node pkg="simulation_app" type="file_uploader.py" name="file_uploader" />
+  <node pkg="simulation_app" type="file_uploader.py" name="file_uploader" >
+       <param name="ROBOT_STOP_TIMEOUT"  type="double" value="60"/>
+       <param name="TOTAL_MAPPING_TIMEOUT"  type="double" value="900"/>
+       <param name="NORM_ONE_DISTANCE_THRESHOLD"  type="double" value="0.1"/>
+       <param name="S3_PREFIX_PATH"  type="str" value="map_results"/>
+       <param name="AWS_ROBOMAKER_SIMULATION_JOB_ID"  type="str" value="$(optenv AWS_ROBOMAKER_SIMULATION_JOB_ID default_job_id"/>
+  </node>
 </launch>

@@ -24,26 +24,23 @@ import rospy
 import actionlib
 import subprocess
 import tf
-import os
 from robomaker_simulation_msgs.srv import Cancel
 from file_uploader_msgs.msg import UploadFilesAction, UploadFilesGoal
 from tf.transformations import euler_from_quaternion
 
 
 class SendData:
-    ACTION = "/s3_file_uploader/UploadFiles"
-    FILE_PATH = "/tmp/"
-    NORM_ONE_DISTANCE_THRESHOLD = 0.1
-    ROBOT_STOP_TIMEOUT = 60  #60 seconds of no motion
-    TOTAL_MAPPING_TIMEOUT = 600  #10 minutes of mapping time
-
     def __init__(self):
-        self.simulation_id = os.environ["AWS_ROBOMAKER_SIMULATION_JOB_ID"]
         self.last_robot_moving_time = rospy.rostime.time.time()
         self.start_time = rospy.rostime.time.time()
         self.prev_nav_pose = {'x' : 0.0, 'y' : 0.0 }
         self.upload_map_and_terminate = False
         self.sent_terminate_command = False
+        self.simulation_id = rospy.get_parm('~AWS_ROBOMAKER_SIMULATION_JOB_ID')
+        self.ROBOT_STOP_TIMEOUT = rospy.get_param('~ROBOT_STOP_TIMEOUT')
+        self.TOTAL_MAPPING_TIMEOUT = rospy.get_parm('~TOTAL_MAPPING_TIMEOUT')
+        self.NORM_ONE_DISTANCE_THRESHOLD = rospy.get_parm('~NORM_ONE_DISTANCE_THRESHOLD')
+        self.S3_PREFIX_PATH = rospy.get_parm('~S3_PREFIX_PATH')
 
     def norm_one_distance(self, point_a, point_b):
         return (abs(point_a['x'] - point_b['x']) + abs(point_a['y'] - point_b['y']))
@@ -60,7 +57,7 @@ class SendData:
                     upload_location=S3_KEY_PREFIX,
                     files=[path + name  + ".pgm"]
                 )
-        client = actionlib.SimpleActionClient(SendData.ACTION, UploadFilesAction)
+        client = actionlib.SimpleActionClient("/s3_file_uploader/UploadFiles", UploadFilesAction)
         client.wait_for_server()
         client.send_goal(goal)
 
@@ -68,7 +65,7 @@ class SendData:
                     upload_location=S3_KEY_PREFIX,
                     files=[path + name  + ".yaml"]
                 )
-        client = actionlib.SimpleActionClient(SendData.ACTION, UploadFilesAction)
+        client = actionlib.SimpleActionClient("/s3_file_uploader/UploadFiles", UploadFilesAction)
         client.wait_for_server()
         client.send_goal(goal)
 
@@ -96,21 +93,21 @@ class SendData:
                 nav_pose['x'] = trans[0]
                 nav_pose['y'] = trans[1]
 
-                if self.norm_one_distance( nav_pose, self.prev_nav_pose ) > SendData.NORM_ONE_DISTANCE_THRESHOLD:
+                if self.norm_one_distance( nav_pose, self.prev_nav_pose ) > self.NORM_ONE_DISTANCE_THRESHOLD:
                     self.last_robot_moving_time = rospy.rostime.time.time()
                     self.prev_nav_pose = nav_pose
 
-                if (rospy.rostime.time.time() - self.last_robot_moving_time) > SendData.ROBOT_STOP_TIMEOUT:
+                if (rospy.rostime.time.time() - self.last_robot_moving_time) > self.ROBOT_STOP_TIMEOUT:
                     rospy.logwarn('[file_uploader] Robot no longer moving')
                     self.upload_map_and_terminate = True
 
-                if (rospy.rostime.time.time() - self.start_time) > SendData.TOTAL_MAPPING_TIMEOUT:
+                if (rospy.rostime.time.time() - self.start_time) > self.TOTAL_MAPPING_TIMEOUT:
                     rospy.logwarn('[file_uploader] Simulation time threshold reached')
                     self.upload_map_and_terminate = True
 
                 if (self.sent_terminate_command is False) and (self.upload_map_and_terminate is True):
-                    self.write_map_to_disk(SendData.FILE_PATH, self.simulation_id)
-                    self.upload_file_request(SendData.FILE_PATH, self.simulation_id)
+                    self.write_map_to_disk(self.S3_PREFIX_PATH, self.simulation_id)
+                    self.upload_file_request(self.S3_PREFIX_PATH, self.simulation_id)
                     self.cancel_job()
                     
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
