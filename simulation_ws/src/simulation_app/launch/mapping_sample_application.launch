@@ -43,6 +43,7 @@
        <param name="NORM_ONE_DISTANCE_THRESHOLD"  type="double" value="0.1"/>
        <param name="S3_PREFIX_PATH"  type="str" value="map_results/"/>
        <param name="LOCAL_WRITE_PATH"  type="str" value="/tmp/"/>
+       <!-- Do not modify the simulation_job_id env variable. Its pulled automatically from RoboMaker Simulations -->
        <param name="AWS_ROBOMAKER_SIMULATION_JOB_ID"  type="str" value="$(optenv AWS_ROBOMAKER_SIMULATION_JOB_ID default_job_id)"/>
   </node>
 </launch>
