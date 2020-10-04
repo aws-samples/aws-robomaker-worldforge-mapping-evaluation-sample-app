@@ -18,7 +18,6 @@ import json
 
 ### Fill these values before running the script
 list_of_world_arns = []
-sim_job_requests = []
 subnet_1 = ""
 subnet_2 = ""
 security_group = ""
@@ -27,6 +26,7 @@ iam_arn = ""
 sim_app_arn = ""
 bucket_name=""
 ### Stop filling here
+sim_job_requests = []
 config= {}
 config['batchPolicy'] = { "timeoutInSeconds": 7200, "maxConcurrency": 5 }
 
