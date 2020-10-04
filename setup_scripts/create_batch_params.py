@@ -26,7 +26,7 @@ assign_ip = True
 iam_arn = ""
 sim_app_arn = ""
 bucket_name=""
-###
+### Stop filling here
 config= {}
 config['batchPolicy'] = { "timeoutInSeconds": 7200, "maxConcurrency": 5 }
 
