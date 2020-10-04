@@ -42,9 +42,9 @@ class SendData:
         self.sent_terminate_command = False
         self.simulation_id = rospy.get_param('~AWS_ROBOMAKER_SIMULATION_JOB_ID')
         self.ROBOT_STOP_TIMEOUT = rospy.get_param('~ROBOT_STOP_TIMEOUT')
-        self.TOTAL_MAPPING_TIMEOUT = rospy.get_parm('~TOTAL_MAPPING_TIMEOUT')
-        self.NORM_ONE_DISTANCE_THRESHOLD = rospy.get_parm('~NORM_ONE_DISTANCE_THRESHOLD')
-        self.S3_PREFIX_PATH = rospy.get_parm('~S3_PREFIX_PATH')
+        self.TOTAL_MAPPING_TIMEOUT = rospy.get_param('~TOTAL_MAPPING_TIMEOUT')
+        self.NORM_ONE_DISTANCE_THRESHOLD = rospy.get_param('~NORM_ONE_DISTANCE_THRESHOLD')
+        self.S3_PREFIX_PATH = rospy.get_param('~S3_PREFIX_PATH')
 
     def norm_one_distance(self, point_a, point_b):
         return (abs(point_a['x'] - point_b['x']) + abs(point_a['y'] - point_b['y']))
@@ -120,6 +120,6 @@ class SendData:
             rate.sleep()
 
 if __name__ == '__main__':
-    rospy.init_node('map_data_uploader')
+    rospy.init_node('file_uploader')
     send_data = SendData()
     send_data.main()
