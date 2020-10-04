@@ -55,10 +55,9 @@ class SendData:
 
     def upload_file_request(self, path, name):
         rospy.loginfo('[file_uploader] Uploading map file to S3 from {}{}'.format(path,name))
-        S3_KEY_PREFIX = "maps/{}/".format(self.simulation_id)
-
+        
         goal = UploadFilesGoal(
-                    upload_location=S3_KEY_PREFIX,
+                    upload_location=self.S3_PREFIX_PATH,
                     files=[path + name  + ".pgm"]
                 )
         client = actionlib.SimpleActionClient("/s3_file_uploader/UploadFiles", UploadFilesAction)
@@ -66,7 +65,7 @@ class SendData:
         client.send_goal(goal)
 
         goal = UploadFilesGoal(
-                    upload_location=S3_KEY_PREFIX,
+                    upload_location=self.S3_PREFIX_PATH,
                     files=[path + name  + ".yaml"]
                 )
         client = actionlib.SimpleActionClient("/s3_file_uploader/UploadFiles", UploadFilesAction)
