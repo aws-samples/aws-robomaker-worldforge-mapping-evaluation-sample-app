@@ -45,6 +45,7 @@ class SendData:
         self.TOTAL_MAPPING_TIMEOUT = rospy.get_param('~TOTAL_MAPPING_TIMEOUT')
         self.NORM_ONE_DISTANCE_THRESHOLD = rospy.get_param('~NORM_ONE_DISTANCE_THRESHOLD')
         self.S3_PREFIX_PATH = rospy.get_param('~S3_PREFIX_PATH')
+        self.LOCAL_WRITE_PATH = rospy.get_param('~LOCAL_WRITE_PATH')
 
     def norm_one_distance(self, point_a, point_b):
         return (abs(point_a['x'] - point_b['x']) + abs(point_a['y'] - point_b['y']))
@@ -52,26 +53,25 @@ class SendData:
     def write_map_to_disk(self, path, name):
         rospy.loginfo('[file_uploader] Writing map file to disk at {}{}'.format(path,name))
         subprocess.call( ['rosrun', 'map_server', 'map_saver', '-f' , path+name] )
-
-    def upload_file_request(self, path, name):
-        rospy.loginfo('[file_uploader] Uploading map file to S3 from {}{}'.format(path,name))
         
+    def upload_file_request(self, local_path, name, s3_path):
+        rospy.loginfo('[file_uploader] Uploading map file to S3 from {}{}'.format(local_path,name))
+
         goal = UploadFilesGoal(
-                    upload_location=self.S3_PREFIX_PATH,
-                    files=[path + name  + ".pgm"]
+                    upload_location=s3_path,
+                    files=[local_path + name  + ".pgm"]
                 )
         client = actionlib.SimpleActionClient("/s3_file_uploader/UploadFiles", UploadFilesAction)
         client.wait_for_server()
         client.send_goal(goal)
 
         goal = UploadFilesGoal(
-                    upload_location=self.S3_PREFIX_PATH,
-                    files=[path + name  + ".yaml"]
+                    upload_location=s3_path,
+                    files=[local_path + name  + ".yaml"]
                 )
         client = actionlib.SimpleActionClient("/s3_file_uploader/UploadFiles", UploadFilesAction)
         client.wait_for_server()
         client.send_goal(goal)
-
 
     def cancel_job(self):
         rospy.logwarn('[file_uploader] Terminating robomaker here')
@@ -83,7 +83,6 @@ class SendData:
             rospy.loginfo("[file_uploader] Successfully requested cancel job")
         else:
             rospy.logerr("[file_uploader] Cancel request failed: %s", response.message)
-
 
     def main(self):
         rate = rospy.Rate(10.0)
@@ -109,8 +108,8 @@ class SendData:
                     self.upload_map_and_terminate = True
 
                 if (self.sent_terminate_command is False) and (self.upload_map_and_terminate is True):
-                    self.write_map_to_disk(self.S3_PREFIX_PATH, self.simulation_id)
-                    self.upload_file_request(self.S3_PREFIX_PATH, self.simulation_id)
+                    self.write_map_to_disk(self.LOCAL_WRITE_PATH, self.simulation_id)
+                    self.upload_file_request(self.LOCAL_WRITE_PATH, self.simulation_id, self.S3_PREFIX_PATH)
                     self.cancel_job()
                     
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
