@@ -44,7 +44,7 @@ def job_params(IAM_ARN, SIM_APP_ARN, WORLD_ID="", BUCKET_NAME="", SUBNET_1="", S
                     "environmentVariables": {
                         "TURTLEBOT3_MODEL": "waffle_pi",
                         "BUCKET_NAME": BUCKET_NAME,
-                        "GAZEBO_WORLD": WORLDFORGE,
+                        "GAZEBO_WORLD": "WORLDFORGE",
                     },
                    "streamUI": True
                 },
