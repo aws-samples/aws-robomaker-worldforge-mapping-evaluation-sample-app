@@ -1,0 +1,30 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="model" default="waffle_pi" />
+  <arg name="x_pos" default="0.0"/>
+  <arg name="y_pos" default="0.0"/>
+  <arg name="z_pos" default="0.0"/>
+  <arg name="yaw" default="0.0"/>
+
+  <!-- Spawn the robot into Gazebo with the turtlebot description -->
+  <include file="$(find turtlebot3_description_reduced_mesh)/launch/spawn_turtlebot.launch">
+    <arg name="x_pos" value="$(arg x_pos)"/>
+    <arg name="y_pos" value="$(arg y_pos)"/>
+    <arg name="z_pos" value="$(arg z_pos)"/>
+    <arg name="yaw" value="$(arg yaw)"/>
+  </include>
+
+  <!-- Publisher robot state for robot transforms -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen"/>
+
+  <!-- mapping -->
+  <node pkg="gmapping" type="slam_gmapping" name="gmapping" />
+
+  <!-- move_base -->
+  <include file="$(find turtlebot3_navigation)/launch/move_base.launch">
+    <arg name="model" value="$(arg model)" />
+  </include>
+
+  <!-- Exploration to build map automatically -->
+  <include file="$(find explore_lite)/launch/explore.launch"/>
+</launch>

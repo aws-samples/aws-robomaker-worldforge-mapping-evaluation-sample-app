@@ -1,0 +1,4 @@
+- git: {local-name: src/deps/aws-robomaker-simulation-ros-pkgs, uri: 'https://github.com/aws-robotics/aws-robomaker-simulation-ros-pkgs.git', version: master}
+- git: {local-name: src/deps/turtlebot3-description-reduced-mesh, uri: "https://github.com/aws-robotics/turtlebot3-description-reduced-mesh.git", version: "ros1"}
+- git: {local-name: src/deps/m-explore, uri: "https://github.com/konduri/m-explore.git", version: "only-explore-lite-package"}
+- git: {local-name: src/deps/aws-robomaker-small-house-world, uri: "https://github.com/aws-robotics/aws-robomaker-small-house-world", version: "ros1"}
