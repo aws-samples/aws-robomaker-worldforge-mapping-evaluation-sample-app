@@ -20,7 +20,7 @@ rosdep install --from-path src --ignore-src -r -y
 colcon build
 source install/setup.bash
 export TURTLEBOT3_MODEL=waffle_pi
-export BUCKET_NAME=<YOUR_BUCKET_NAME>
+export BUCKET_NAME="<YOUR_BUCKET_NAME>"
 roslaunch simulation_app mapping_sample_application.launch gui:=true x_pos:=3.5 y_pos:=2.0
 ```
 
