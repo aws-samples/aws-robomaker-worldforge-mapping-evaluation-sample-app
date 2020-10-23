@@ -9,4 +9,8 @@ simulation_ws/log/*
 simulation_ws/bundle/*
 simulation_ws/build/*
 */batch_config.json
+*/trust_policy.json
+*/template.json
+*/mapping_robomaker_policy.json
+*/generation_job_output.json
 

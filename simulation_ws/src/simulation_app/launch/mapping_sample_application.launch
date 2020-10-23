@@ -8,7 +8,7 @@
   <arg name="yaw" default="0.0"/>
   <arg name="gui" default="false"/>
   <arg name="open_rviz" default="true" />
-  <arg name="s3_bucket" default="$(optenv BUCKET_NAME your-s3-bucket-name)" />
+  <arg name="s3_bucket" default="$(BUCKET_NAME)" />
   <arg name="model" default="$(optenv TURTLEBOT3_MODEL waffle_pi)" doc="model type [burger, waffle, waffle_pi]"/>
   <arg name="gazebo_world" default="$(optenv GAZEBO_WORLD DEFAULT)" doc="model  type [DEFAULT, WORLDFORGE]" />
 
