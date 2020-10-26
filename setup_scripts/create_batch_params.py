@@ -15,22 +15,17 @@ usage: 'python create_batch_params.py'
 
 
 import json
+import os
+import sys
 
-### Fill these values before running the script
-list_of_world_arns = []
-subnet_1 = ""
-subnet_2 = ""
-security_group = ""
-assign_ip = True
-iam_arn = ""
-sim_app_arn = ""
-bucket_name=""
-### Stop filling here
-sim_job_requests = []
-config= {}
-config['batchPolicy'] = { "timeoutInSeconds": 7200, "maxConcurrency": 5 }
 
-def job_params(IAM_ARN, SIM_APP_ARN, WORLD_ID="", BUCKET_NAME="", SUBNET_1="", SUBNET_2="", SECURITY_GROUP="", ASSIGN_IP=True):
+def job_params( WORLD_ID ):
+    SUBNET_1 = os.environ['SUBNET_1']
+    SUBNET_2 = os.environ['SUBNET_2']
+    SECURITY_GROUP = os.environ['SECURITY_GROUP']
+    IAM_ARN = os.environ['IAM_ROLE_ARN']
+    SIM_APP_ARN = os.environ['SIM_APP_ARN']
+    BUCKET_NAME = os.environ['BUCKET_NAME']
     return {
         "maxJobDurationInSeconds": 3600,
         "iamRole": IAM_ARN,
@@ -63,13 +58,25 @@ def job_params(IAM_ARN, SIM_APP_ARN, WORLD_ID="", BUCKET_NAME="", SUBNET_1="", S
             "securityGroups": [
                 SECURITY_GROUP
             ],
-            "assignPublicIp": ASSIGN_IP
+            "assignPublicIp": True
         },
     }
 
-for world_id in list_of_world_arns:
-    sim_job_requests.append(job_params(iam_arn, sim_app_arn, world_id, bucket_name, subnet_1, subnet_2, security_group, assign_ip))
 
-config['createSimulationJobRequests'] = sim_job_requests
-with open("batch_config.json", 'w') as f:
-    f.write(json.dumps(config,indent=4, sort_keys=True ))
+if __name__ == "__main__":
+    sim_job_requests = []
+    config= {}
+    config['batchPolicy'] = { "timeoutInSeconds": 7200, "maxConcurrency": 5 }
+    
+    with open('generation_job_output.json', 'r') as f:
+        output_world_generation = json.load(f)
+
+    list_of_world_arns = output_world_generation['finishedWorldsSummary']['succeededWorlds']
+
+    for world_id in list_of_world_arns:
+        sim_job_requests.append(job_params(world_id))
+
+    config['createSimulationJobRequests'] = sim_job_requests
+    with open("batch_config.json", 'w') as f:
+        f.write(json.dumps(config,indent=4, sort_keys=True ))
+    print("Completed writing batch configuration to batch_config.json")
