@@ -23,6 +23,9 @@ export TURTLEBOT3_MODEL=waffle_pi
 export BUCKET_NAME="<YOUR_BUCKET_NAME>"
 roslaunch simulation_app mapping_sample_application.launch gui:=true x_pos:=3.5 y_pos:=2.0
 ```
+### Instructions for running on AWS RoboMaker
+
+Follow blog at https://aws.amazon.com/blogs/robotics/testing-map-generation-worldforge-simulation/
 
 ## Security
 
