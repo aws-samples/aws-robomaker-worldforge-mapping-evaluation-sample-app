@@ -30,6 +30,7 @@
   <depend>turtlebot3_navigation</depend>
   <exec_depend>gazebo</exec_depend>
   <depend>gmapping</depend>
+  <depend>dwa_local_planner</depend>
   <depend>robot_state_publisher</depend>
   <depend>s3_file_uploader</depend>
   <depend>move_base</depend>
