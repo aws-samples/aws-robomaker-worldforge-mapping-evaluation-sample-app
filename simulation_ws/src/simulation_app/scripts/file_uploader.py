@@ -28,7 +28,6 @@ import rospy
 import subprocess
 import tf
 from robomaker_simulation_msgs.srv import Cancel
-from file_uploader_msgs.msg import UploadFilesAction, UploadFilesGoal
 from tf.transformations import euler_from_quaternion
 
 

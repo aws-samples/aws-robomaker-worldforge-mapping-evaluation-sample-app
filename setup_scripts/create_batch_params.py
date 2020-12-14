@@ -16,13 +16,10 @@ usage: 'python create_batch_params.py'
 
 import json
 import os
-import sys
 
+LOCAL_WRITE_MAP_FOLDER = "/home/robomaker/"
 
 def job_params( WORLD_ID ):
-    SUBNET_1 = os.environ['SUBNET_1']
-    SUBNET_2 = os.environ['SUBNET_2']
-    SECURITY_GROUP = os.environ['SECURITY_GROUP']
     IAM_ARN = os.environ['IAM_ROLE_ARN']
     SIM_APP_ARN = os.environ['SIM_APP_ARN']
     BUCKET_NAME = os.environ['BUCKET_NAME']
@@ -30,6 +27,9 @@ def job_params( WORLD_ID ):
         "maxJobDurationInSeconds": 3600,
         "iamRole": IAM_ARN,
         "failureBehavior": "Fail",
+        "outputLocation": {
+            "s3Bucket": BUCKET_NAME,
+        },
         "simulationApplications": [
             {
                 "application": SIM_APP_ARN,
@@ -38,11 +38,19 @@ def job_params( WORLD_ID ):
                     "launchFile": "mapping_sample_application.launch",
                     "environmentVariables": {
                         "TURTLEBOT3_MODEL": "waffle_pi",
-                        "BUCKET_NAME": BUCKET_NAME,
                         "GAZEBO_WORLD": "WORLDFORGE",
+                        "LOCAL_MAP_WRITE_FOLDER": LOCAL_WRITE_MAP_FOLDER,
                     },
                    "streamUI": True
                 },
+                "uploadConfigurations": [
+                    {
+                        "name": "map_results",
+                        "path": LOCAL_WRITE_MAP_FOLDER + "**.pgm",
+                        "uploadBehavior": "UPLOAD_ON_TERMINATE"
+                    }
+                ],
+                "useDefaultUploadConfigurations": False,
                 "worldConfigs": [
                     {
                         "world": WORLD_ID
@@ -50,16 +58,6 @@ def job_params( WORLD_ID ):
                 ]
             }
         ],
-        "vpcConfig": {
-            "subnets": [
-                SUBNET_1,
-                SUBNET_2,
-            ],
-            "securityGroups": [
-                SECURITY_GROUP
-            ],
-            "assignPublicIp": True
-        },
     }
 
 
