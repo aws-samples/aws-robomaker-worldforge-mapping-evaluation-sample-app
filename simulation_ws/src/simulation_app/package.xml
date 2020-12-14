@@ -32,7 +32,6 @@
   <depend>gmapping</depend>
   <depend>dwa_local_planner</depend>
   <depend>robot_state_publisher</depend>
-  <depend>s3_file_uploader</depend>
   <depend>move_base</depend>
   <depend>aws_robomaker_simulation_ros_pkgs</depend>
 

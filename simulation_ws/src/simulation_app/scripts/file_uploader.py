@@ -25,7 +25,6 @@ moving for a certain time, or the simulation itself has run for a designated tim
 """
 
 import rospy
-import actionlib
 import subprocess
 import tf
 from robomaker_simulation_msgs.srv import Cancel
@@ -38,14 +37,13 @@ class SendData:
         self.last_robot_moving_time = rospy.rostime.time.time()
         self.start_time = rospy.rostime.time.time()
         self.prev_nav_pose = {'x' : 0.0, 'y' : 0.0 }
-        self.upload_map_and_terminate = False
+        self.write_map_and_terminate = False
         self.sent_terminate_command = False
         self.simulation_id = rospy.get_param('~AWS_ROBOMAKER_SIMULATION_JOB_ID')
         self.ROBOT_STOP_TIMEOUT = rospy.get_param('~ROBOT_STOP_TIMEOUT')
         self.TOTAL_MAPPING_TIMEOUT = rospy.get_param('~TOTAL_MAPPING_TIMEOUT')
         self.NORM_ONE_DISTANCE_THRESHOLD = rospy.get_param('~NORM_ONE_DISTANCE_THRESHOLD')
-        self.S3_PREFIX_PATH = rospy.get_param('~S3_PREFIX_PATH')
-        self.LOCAL_WRITE_PATH = rospy.get_param('~LOCAL_WRITE_PATH')
+        self.LOCAL_MAP_WRITE_FOLDER = rospy.get_param('~LOCAL_MAP_WRITE_FOLDER')
 
     def norm_one_distance(self, point_a, point_b):
         return (abs(point_a['x'] - point_b['x']) + abs(point_a['y'] - point_b['y']))
@@ -54,25 +52,6 @@ class SendData:
         rospy.loginfo('[file_uploader] Writing map file to disk at {}{}'.format(path,name))
         subprocess.call( ['rosrun', 'map_server', 'map_saver', '-f' , path+name] )
         
-    def upload_file_request(self, local_path, name, s3_path):
-        rospy.loginfo('[file_uploader] Uploading map file to S3 from {}{}'.format(local_path,name))
-
-        goal = UploadFilesGoal(
-                    upload_location=s3_path,
-                    files=[local_path + name  + ".pgm"]
-                )
-        client = actionlib.SimpleActionClient("/s3_file_uploader/UploadFiles", UploadFilesAction)
-        client.wait_for_server()
-        client.send_goal(goal)
-
-        goal = UploadFilesGoal(
-                    upload_location=s3_path,
-                    files=[local_path + name  + ".yaml"]
-                )
-        client = actionlib.SimpleActionClient("/s3_file_uploader/UploadFiles", UploadFilesAction)
-        client.wait_for_server()
-        client.send_goal(goal)
-
     def cancel_job(self):
         rospy.logwarn('[file_uploader] Terminating robomaker here')
         rospy.wait_for_service("/robomaker/job/cancel")
@@ -101,15 +80,14 @@ class SendData:
 
                 if (rospy.rostime.time.time() - self.last_robot_moving_time) > self.ROBOT_STOP_TIMEOUT:
                     rospy.logwarn('[file_uploader] Robot no longer moving')
-                    self.upload_map_and_terminate = True
+                    self.write_map_and_terminate = True
 
                 if (rospy.rostime.time.time() - self.start_time) > self.TOTAL_MAPPING_TIMEOUT:
                     rospy.logwarn('[file_uploader] Simulation time threshold reached')
-                    self.upload_map_and_terminate = True
+                    self.write_map_and_terminate = True
 
-                if (self.sent_terminate_command is False) and (self.upload_map_and_terminate is True):
-                    self.write_map_to_disk(self.LOCAL_WRITE_PATH, self.simulation_id)
-                    self.upload_file_request(self.LOCAL_WRITE_PATH, self.simulation_id, self.S3_PREFIX_PATH)
+                if (self.sent_terminate_command is False) and (self.write_map_and_terminate is True):
+                    self.write_map_to_disk(self.LOCAL_MAP_WRITE_FOLDER, self.simulation_id)
                     self.cancel_job()
                     
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
