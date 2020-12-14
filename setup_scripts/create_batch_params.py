@@ -17,9 +17,8 @@ usage: 'python create_batch_params.py'
 import json
 import os
 
-LOCAL_WRITE_MAP_FOLDER = "/home/robomaker/"
-
 def job_params( WORLD_ID ):
+    LOCAL_WRITE_MAP_FOLDER = "/home/robomaker/"
     IAM_ARN = os.environ['IAM_ROLE_ARN']
     SIM_APP_ARN = os.environ['SIM_APP_ARN']
     BUCKET_NAME = os.environ['BUCKET_NAME']
@@ -50,7 +49,7 @@ def job_params( WORLD_ID ):
                         "uploadBehavior": "UPLOAD_ON_TERMINATE"
                     }
                 ],
-                "useDefaultUploadConfigurations": False,
+                "useDefaultUploadConfigurations": True,
                 "worldConfigs": [
                     {
                         "world": WORLD_ID
