@@ -18,7 +18,7 @@ import json
 import os
 
 def job_params( WORLD_ID ):
-    LOCAL_WRITE_MAP_FOLDER = "/home/robomaker/"
+    LOCAL_MAP_WRITE_FOLDER = "/home/robomaker/"
     IAM_ARN = os.environ['IAM_ROLE_ARN']
     SIM_APP_ARN = os.environ['SIM_APP_ARN']
     BUCKET_NAME = os.environ['BUCKET_NAME']
@@ -38,14 +38,14 @@ def job_params( WORLD_ID ):
                     "environmentVariables": {
                         "TURTLEBOT3_MODEL": "waffle_pi",
                         "GAZEBO_WORLD": "WORLDFORGE",
-                        "LOCAL_MAP_WRITE_FOLDER": LOCAL_WRITE_MAP_FOLDER,
+                        "LOCAL_MAP_WRITE_FOLDER": LOCAL_MAP_WRITE_FOLDER,
                     },
                    "streamUI": True
                 },
                 "uploadConfigurations": [
                     {
                         "name": "map_results",
-                        "path": LOCAL_WRITE_MAP_FOLDER + "**.pgm",
+                        "path": LOCAL_MAP_WRITE_FOLDER + "**.pgm",
                         "uploadBehavior": "UPLOAD_ON_TERMINATE"
                     }
                 ],
